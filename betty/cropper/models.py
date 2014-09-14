@@ -144,11 +144,30 @@ class ImageManager(models.Manager):
 
 class Image(models.Model):
 
+    PENDING = 0
+    DONE = 1
+    FAILED = 2
+    STATUS_CHOICES = (
+        (PENDING, 'Pending'),
+        (DONE, 'Done'),
+        (FAILED, 'Failed')
+    )
+
     name = models.CharField(max_length=255)
     credit = models.CharField(max_length=120, null=True, blank=True)
 
-    source = models.FileField(upload_to=source_upload_to, storage=betty_storage, max_length=255, null=True, blank=True)
-    optimized = models.FileField(upload_to=optimized_upload_to, storage=betty_storage, max_length=255, null=True, blank=True)
+    source = models.FileField(
+        upload_to=source_upload_to,
+        storage=betty_storage,
+        max_length=255,
+        null=True,
+        blank=True)
+    optimized = models.FileField(
+        upload_to=optimized_upload_to,
+        storage=betty_storage,
+        max_length=255,
+        null=True,
+        blank=True)
     
     height = models.IntegerField(null=True, blank=True)
     width = models.IntegerField(null=True, blank=True)
@@ -157,6 +176,9 @@ class Image(models.Model):
 
     jpeg_quality = models.IntegerField(null=True, blank=True)
     animated = models.BooleanField(default=False)
+
+    url = models.URLField(null=True, blank=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=DONE)
 
     objects = ImageManager()
 
