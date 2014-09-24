@@ -3,12 +3,29 @@ from __future__ import absolute_import
 import itertools
 import os
 import tempfile
+import urllib2
 
 from celery import shared_task
 from PIL import Image as PILImage
 
 from betty.conf.app import settings
 
+BOT_HEADERS = {
+    "User-Agent": "BettyCropper ({})".format(settings.BETTY_IMAGE_URL)
+}
+
+
+@shared_task
+def download_image(image_id):
+    from betty.cropper.models import Image
+
+    image = Image.objects.get(id=image_id)
+    request = urllib2.Request(image.url, headers=BOT_HEADERS)
+    try:
+        remote_file = urllib2.urlopen(request)
+        filename = 
+    except:
+        pass
 
 @shared_task
 def search_image_quality(image_id):

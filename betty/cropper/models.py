@@ -91,6 +91,17 @@ class Ratio(object):
 
 class ImageManager(models.Manager):
 
+    def create_from_url(self, url, name=None, credit=None):
+        """Creates an image from a URL"""
+        image = self.create(
+            name=name or url[-255:],
+            credit=credit,
+            url=url,
+            status=Image.PENDING
+        )
+        os.makedirs(image.path())
+        return image
+
     def create_from_path(self, path, filename=None, name=None, credit=None):
         """Creates an image object from a TemporaryUploadedFile insance"""
 
