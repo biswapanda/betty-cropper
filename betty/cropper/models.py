@@ -10,7 +10,7 @@ from PIL import Image as PILImage
 from PIL import JpegImagePlugin
 
 from betty.conf.app import settings
-from betty.cropper.tasks import search_image_quality
+from betty.cropper.tasks import search_image_quality, download_image
 
 from jsonfield import JSONField
 
@@ -100,6 +100,8 @@ class ImageManager(models.Manager):
             status=Image.PENDING
         )
         os.makedirs(image.path())
+        download_image.apply_async(args=(image.id,))
+
         return image
 
     def create_from_path(self, path, filename=None, name=None, credit=None):

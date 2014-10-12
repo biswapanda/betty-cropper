@@ -24,7 +24,7 @@ def download_failed(task, exc, task_id, args, kwargs, einfo):
     image.save()
 
 
-@shared_task(on_failure=download_failed)
+@shared_task()
 def download_image(image_id):
     from betty.cropper.models import Image, source_upload_to, optimize_image
 
