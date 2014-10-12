@@ -11,7 +11,6 @@ cache:
   directories:
   - "$HOME/.pip-cache/"
 install:
-- pip install django==$DJANGO_VERSION
 - pip install --download-cache $HOME/.pip-cache -r requirements-dev.txt
 script:
 - py.test tests/ --cov betty --cov-report term-missing
