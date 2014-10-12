@@ -382,12 +382,12 @@ class Image(models.Model):
             self.width = settings.BETTY_MAX_WIDTH
         
         data = {
-            'id': self.id,
-            'name': self.name,
-            'width': self.get_width(),
-            'height': self.get_height(),
-            'credit': self.credit,
-            'selections': {}
+            "id": self.id,
+            "name": self.name,
+            "width": self.get_width(),
+            "height": self.get_height(),
+            "credit": self.credit,
+            "selections": {}
         }
         for ratio in settings.BETTY_RATIOS:
             data['selections'][ratio] = self.get_selection(Ratio(ratio))

@@ -3,7 +3,9 @@ from __future__ import absolute_import
 import itertools
 import os
 import tempfile
-import urllib2
+import requests
+import urlparse
+import shutil
 
 from celery import shared_task
 from PIL import Image as PILImage
@@ -15,17 +17,65 @@ BOT_HEADERS = {
 }
 
 
-@shared_task
-def download_image(image_id):
+def download_failed(task, exc, task_id, args, kwargs, einfo):
     from betty.cropper.models import Image
+    image = Image.objects.get(id=args[0])
+    image.status = Image.FAILED
+    image.save()
+
+
+@shared_task(on_failure=download_failed)
+def download_image(image_id):
+    from betty.cropper.models import Image, source_upload_to, optimize_image
 
     image = Image.objects.get(id=image_id)
-    request = urllib2.Request(image.url, headers=BOT_HEADERS)
-    try:
-        remote_file = urllib2.urlopen(request)
-        filename = 
-    except:
-        pass
+    response = requests.get(image.url, headers=BOT_HEADERS, stream=True)
+    
+    # On a failure, just don't save the image
+    if response.status_code != 200:
+        image.status = Image.FAILED
+        image.save()
+        return
+
+    # TODO: Parse content-disposition header
+    parsed = urlparse.urlsplit(response.url)
+    filename = os.path.basename(parsed.path)
+
+    source_path = source_upload_to(image, filename)
+    with open(source_path, "wb+") as image_file:
+        for content in response.iter_content(chunk_size=512):
+            image_file.write(content)
+
+    im = PILImage.open(source_path)
+    image.width = im.size[0]
+    image.height = im.size[1]
+
+    image.source.name = source_path
+
+    # If the image is a GIF, we need to do some special stuff
+    if im.format == "GIF":
+        image.animated = True
+
+        os.makedirs(os.path.join(image.path(), "animated"))
+
+        # First, let's copy the original
+        animated_path = os.path.join(image.path(), "animated/original.gif")
+        shutil.copy(source_path, animated_path)
+        os.chmod(animated_path, 744)
+        
+        # Next, we'll make a thumbnail of the original
+        still_path = os.path.join(image.path(), "animated/original.jpg")
+        if im.mode != "RGB":
+            jpeg = im.convert("RGB")
+            jpeg.save(still_path, "JPEG")
+        else:
+            im.save(still_path, "JPEG")
+
+    image.status = Image.DONE
+
+    image.save()
+    optimize_image(image)
+
 
 @shared_task
 def search_image_quality(image_id):
