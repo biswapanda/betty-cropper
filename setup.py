@@ -26,6 +26,7 @@ dev_requires = [
     "pytest-django",
     "pytest-cov>=1.4",
     "coveralls==0.4.1",
+    "httmock==1.2.2"
 ]
 
 install_requires = [
@@ -36,7 +37,8 @@ install_requires = [
     "Pillow==2.5.3",
     "South==0.8.4",
     "logan==0.5.9.1",
-    "celery==3.1.11"
+    "celery==3.1.11",
+    "requests==2.4.3"
 ]
 
 server_requires = []
