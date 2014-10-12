@@ -6,4 +6,3 @@ pytest
 pytest-django
 pytest-cov>=1.4
 coveralls==0.4.1
-httmock==1.2.2
