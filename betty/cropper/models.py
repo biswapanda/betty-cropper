@@ -5,6 +5,7 @@ import shutil
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import reverse
+from django.core.validators import URLValidator
 
 from PIL import Image as PILImage
 from PIL import JpegImagePlugin
@@ -93,6 +94,9 @@ class ImageManager(models.Manager):
 
     def create_from_url(self, url, name=None, credit=None):
         """Creates an image from a URL"""
+        validator = URLValidator()
+        validator(url)
+
         image = self.create(
             name=name or url[-255:],
             credit=credit,
