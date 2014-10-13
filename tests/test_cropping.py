@@ -173,6 +173,30 @@ class ImageSavingTestCase(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertFalse(os.path.exists(os.path.join(image.path(), 'original', '666.jpg')))
 
+    def test_image_pending(self):
+        image = Image.objects.create(
+            name="Lenna.png",
+            width=512,
+            height=512,
+            status=Image.PENDING,
+            url="http://example.com/lenna/png"
+        )
+
+        res = self.client.get('/images/{}/original/666.jpg'.format(image.id))
+        self.assertEqual(res.status_code, 202)
+
+    def test_image_failed(self):
+        image = Image.objects.create(
+            name="Lenna.png",
+            width=512,
+            height=512,
+            status=Image.FAILED,
+            url="http://example.com/lenna/png"
+        )
+
+        res = self.client.get('/images/{}/original/666.jpg'.format(image.id))
+        self.assertEqual(res.status_code, 410)
+
     def test_non_rgb(self):
         image = Image.objects.create(
             name="animated.gif",

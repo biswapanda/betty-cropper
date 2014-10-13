@@ -105,7 +105,6 @@ class ImageManager(models.Manager):
         )
         os.makedirs(image.path())
         download_image.apply_async(args=(image.id,))
-
         return image
 
     def create_from_path(self, path, filename=None, name=None, credit=None):

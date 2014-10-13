@@ -7,7 +7,8 @@ from django.views.decorators.cache import cache_control
 from six.moves import urllib
 
 from .models import Image, Ratio
-from .utils.placeholder import placeholder
+from .http import PlaceholderResponse, PendingResponse, FailureResponse
+
 
 EXTENSION_MAP = {
     "jpg": {
@@ -82,15 +83,15 @@ def crop(request, id, ratio_slug, width, extension):
         image = Image.objects.get(id=image_id)
     except Image.DoesNotExist:
         if settings.BETTY_PLACEHOLDER:
-            img_blob = placeholder(ratio, width, extension)
-            resp = HttpResponse(img_blob)
-            resp["Cache-Control"] = "no-cache, no-store, must-revalidate"
-            resp["Pragma"] = "no-cache"
-            resp["Expires"] = "0"
-            resp["Content-Type"] = EXTENSION_MAP[extension]["mime_type"]
-            return resp
+            return PlaceholderResponse(ratio, width, extension)
         else:
             raise Http404
+
+    if image.status == Image.PENDING:
+        return PendingResponse(ratio, width, extension)
+
+    if image.status == Image.FAILED:
+        return FailureResponse(ratio, width, extension)
 
     try:
         image_blob = image.crop(ratio, width, extension)
