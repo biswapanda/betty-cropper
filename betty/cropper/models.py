@@ -164,9 +164,9 @@ class Image(models.Model):
     DONE = 1
     FAILED = 2
     STATUS_CHOICES = (
-        (PENDING, 'Pending'),
-        (DONE, 'Done'),
-        (FAILED, 'Failed')
+        (PENDING, 'pending'),
+        (DONE, 'done'),
+        (FAILED, 'failed')
     )
 
     name = models.CharField(max_length=255)
@@ -392,7 +392,8 @@ class Image(models.Model):
             "width": self.get_width(),
             "height": self.get_height(),
             "credit": self.credit,
-            "selections": {}
+            "selections": {},
+            "status": self.get_status_display()
         }
         for ratio in settings.BETTY_RATIOS:
             data['selections'][ratio] = self.get_selection(Ratio(ratio))

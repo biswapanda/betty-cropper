@@ -53,16 +53,24 @@ def crossdomain(origin="*", methods=[], headers=["X-Betty-Api-Key", "Content-Typ
 @crossdomain(methods=['POST', 'OPTIONS'])
 @betty_token_auth(["server.image_add"])
 def new(request):
-    image_file = request.FILES.get("image")
-    if image_file is None:
+    if "image" in request.FILES:
+        image_file = request.FILES.get("image")
+        image = Image.objects.create_from_path(
+            image_file.temporary_file_path(),
+            filename=image_file.name,
+            name=request.POST.get("name"),
+            credit=request.POST.get("credit")
+        )
+    elif "url" in request.POST:
+        url = request.POST["url"]
+        image = Image.objects.create_from_url(
+            url=url,
+            filename=image_file.name,
+            name=request.POST.get("name"),
+            credit=request.POST.get("credit")
+        )
+    else:
         return HttpResponseBadRequest(json.dumps({'message': 'No image'}))
-
-    image = Image.objects.create_from_path(
-        image_file.temporary_file_path(),
-        filename=image_file.name,
-        name=request.POST.get("name"),
-        credit=request.POST.get("credit")
-    )
 
     return HttpResponse(json.dumps(image.to_native()), content_type="application/json")
 
