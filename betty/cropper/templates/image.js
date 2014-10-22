@@ -7,6 +7,30 @@
       ASPECT_RATIO_TOLERANCE = .1, // 10% tolerance.
       breakpoints = [{{ BETTY_WIDTHS|join:","}}];
 
+  // Credit to https://remysharp.com/2010/07/21/throttling-function-calls
+  function throttle(fn, threshhold, scope) {
+    threshhold || (threshhold = 250);
+    var last,
+        deferTimer;
+    return function () {
+      var context = scope || this;
+
+      var now = +new Date,
+          args = arguments;
+      if (last && now < last + threshhold) {
+        // hold on to it
+        clearTimeout(deferTimer);
+        deferTimer = setTimeout(function () {
+          last = now;
+          fn.apply(context, args);
+        }, threshhold);
+      } else {
+        last = now;
+        fn.apply(context, args);
+      }
+    };
+  }
+
   w.picturefill = function(elements, forceRerender) {
 
     // get elements to picturefill
@@ -177,16 +201,7 @@
       }, 100);
     });
 
-    var scrollTimeout;
-    addEventListener(w, "scroll", function() {
-      if (scrollTimeout !== null) {
-        return;
-      }
-      scrollTimeout = setTimeout(function () {
-        w.picturefill();
-        scrollTimeout = null;
-      }, 100);
-    });
+    addEventListener(w, "scroll", throttle(w.picturefill, 100));
 
   }
 
