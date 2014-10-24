@@ -5,9 +5,9 @@ import os
 import tempfile
 import requests
 try:
-    from urlparse import urlparse
+    from urlparse import urlsplit
 except ImportError:
-    from urllib.parse import urlparse  # noqa
+    from urllib.parse import urlsplit
 import shutil
 
 from celery import shared_task
@@ -41,7 +41,7 @@ def download_image(image_id):
         return
 
     # TODO: Parse content-disposition header
-    parsed = urlparse.urlsplit(response.url)
+    parsed = urlsplit(response.url)
     filename = os.path.basename(parsed.path)
 
     source_path = source_upload_to(image, filename)
