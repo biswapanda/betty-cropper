@@ -4,7 +4,10 @@ import itertools
 import os
 import tempfile
 import requests
-import urlparse
+try:
+    from urlparse import urljoin
+except ImportError:
+    from urllib.parse import urljoin  # noqa
 import shutil
 
 from celery import shared_task
