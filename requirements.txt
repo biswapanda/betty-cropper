@@ -1,6 +1,5 @@
 Django>=1.5
-logan==0.5.10
-#-e git+git://github.com/theonion/logan.git@python3#egg=logan
+-e git+git://github.com/dcramer/logan.git#egg=logan
 slimit==0.8.1
 Pillow==2.5.3
 South==0.8.4
