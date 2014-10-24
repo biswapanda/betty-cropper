@@ -5,9 +5,9 @@ import os
 import tempfile
 import requests
 try:
-    from urlparse import urljoin
+    from urlparse import urlparse
 except ImportError:
-    from urllib.parse import urljoin  # noqa
+    from urllib.parse import urlparse  # noqa
 import shutil
 
 from celery import shared_task
