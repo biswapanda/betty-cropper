@@ -37,7 +37,8 @@ def image_js(request):
         betty_image_url = betty_image_url[:-1]
     context = {
         "BETTY_IMAGE_URL": betty_image_url,
-        "BETTY_WIDTHS": sorted(widths)
+        "BETTY_WIDTHS": sorted(widths),
+        "BETTY_MAX_WIDTH": settings.BETTY_MAX_WIDTH
     }
     BETTY_RATIOS = []
     ratios_sorted = sorted(settings.BETTY_RATIOS, key=lambda r: Ratio(r).width / float(Ratio(r).height))
@@ -74,7 +75,7 @@ def crop(request, id, ratio_slug, width, extension):
 
     width = int(width)
 
-    if width > 2000:
+    if width > settings.BETTY_MAX_WIDTH:
         return HttpResponseServerError("Invalid width")
 
     image_id = int(id.replace("/", ""))
